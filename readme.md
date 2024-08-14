@@ -4,7 +4,7 @@ Hailo object detection mini server
 
 A local AI object detection server compatible with [Codeproject.AI](https://github.com/codeproject/CodeProject.AI-Server) 
 API request/responses, so it can be used instead of Codeproject.AI with [Frigate](https://github.com/blakeblackshear/frigate) 
-and [Blue Iris])(https://blueirissoftware.com/) VCR software   
+and [Blue Iris](https://blueirissoftware.com/) VCR software   
 The server is using precompiled available Hailo models and binaries, can run locally and as a Docker container. It has 
 a primitive Web UI for debugging.
 The project is in its early state and mostly a POC. Most of the code was taken from 

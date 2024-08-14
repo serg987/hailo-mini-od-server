@@ -6,6 +6,6 @@ __pycache__
 
 *.log
 *.whl
-*.jpg
+models/*.jpg
 *.deb
 *.whl
