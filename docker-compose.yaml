@@ -1,0 +1,16 @@
+services:
+  hailo-object-detection-mini:
+    image: hailo-od-mini
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+      - /dev:/dev
+      - /lib/firmware:/lib/firmware
+      - /lib/udev/rules.d:/lib/udev/rules.d
+      - /lib/modules:/lib/modules
+      - /usr/share/fonts:/usr/share/fonts
+    devices:
+      - /dev/hailo0:/dev/hailo0
+    entrypoint: "python main.py"
+

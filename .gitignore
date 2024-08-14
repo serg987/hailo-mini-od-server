@@ -1,0 +1,11 @@
+.idea
+.venv
+.ipynb_checkpoints
+models/*.hef
+__pycache__
+
+*.log
+*.whl
+*.jpg
+*.deb
+*.whl

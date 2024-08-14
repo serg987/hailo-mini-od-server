@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>POST Request Example</title>
+    <!--  favicon was randomly generated with https://realfavicongenerator.net; may be used wherever else -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+</head>
+<body>
+    <h1>Get list-custom response</h1>
+    <button id="getListCustom">Get list-custom</button>
+    <div id="getListCustomContainer">
+        <table id="responseTable">
+            <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody id="responseBody"></tbody>
+        </table>
+    </div>
+    <h1>Submit a file for analysis (/v1/vision/detection)</h1>
+    <div>
+      <!--  <form id="uploadForm"> -->
+            <input type="file" id="fileChooser" name="image" accept=".jpg, .jpeg, .png">
+            <br>
+            <label for="minConfidence">Minimum Confidence:</label>
+            <input type="number" id="minConfidence" name="min_confidence" step="0.01" value="0.4">
+            <br>
+            <button id="postButton">Send POST Request</button>
+      <!--   </form> -->
+    </div>
+    <div id="detectResponseContainer">
+        <pre id="detectResponse"></pre>
+    </div>
+    <h1>Submit a file for analysis with visualization (/v1/visualization/custom/{model}), get models first by clicking on 'Get list-custom' button</h1>
+    <div>
+      <!--  <form id="uploadFormVis"> -->
+            <input type="file" id="fileChooserVis" name="image" accept=".jpg, .jpeg, .png">
+            <br>
+            <label for="customModelVis">Custom Model:</label>
+            <select id="customModelVis" name="custom_model_vis">
+            <option value="">Select a model</option>
+            </select>
+            <br>
+            <label for="minConfidenceVis">Minimum Confidence:</label>
+            <input type="number" id="minConfidenceVis" name="min_confidence" step="0.01" value="0.4">
+            <br>
+            <button id="postButtonVis">Send Visualisation POST Request</button>
+      <!--   </form> -->
+    </div>
+    <div id="visualizationContainer">
+        <h2>Visualization Image</h2>
+        <img id="visualizationImage" src="" alt="Visualization Image" style="display: none; max-width: 100%;">
+        <h2>JSON Response</h2>
+        <pre id="detectVisResponse"></pre>
+    </div>
+    <script>
+        document.getElementById('getListCustom').addEventListener('click', function () {
+            // Create a new XMLHttpRequest object
+            var xhr = new XMLHttpRequest();
+
+            // Configure the request
+            xhr.open('POST', '/v1/vision/custom/list', true);
+
+            // Set up the callback function to handle the response
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        // Parse the JSON response
+                        var jsonResponse = JSON.parse(xhr.responseText);
+
+                        // Populate the Custom Model dropdown
+                        var modelSelect = document.getElementById('customModelVis');
+                        modelSelect.innerHTML = ''; // Clear existing options
+
+                        // Add the default option
+                        var defaultOption = document.createElement('option');
+                        defaultOption.value = '';
+                        defaultOption.textContent = 'Select a model';
+                        modelSelect.appendChild(defaultOption);
+
+                        // Iterate through the models array and add options to the dropdown
+                        if (jsonResponse.models && Array.isArray(jsonResponse.models)) {
+                            jsonResponse.models.sort(); // Sort the array alphabetically
+
+                            jsonResponse.models.forEach(function(model) {
+                                var option = document.createElement('option');
+                                option.value = model;
+                                option.textContent = model;
+                                modelSelect.appendChild(option);
+                            });
+                        }
+
+                        // Create a table to display the JSON data
+                        var table = document.getElementById('responseTable');
+                        var tbody = document.getElementById('responseBody');
+                        tbody.innerHTML = '';
+
+                        // Iterate through the JSON object and add rows to the table
+                        for (var key in jsonResponse) {
+                            if (jsonResponse.hasOwnProperty(key)) {
+                                var row = document.createElement('tr');
+                                var keyCell = document.createElement('td');
+                                var valueCell = document.createElement('td');
+
+                                keyCell.textContent = key;
+                                valueCell.textContent = jsonResponse[key];
+
+                                row.appendChild(keyCell);
+                                row.appendChild(valueCell);
+                                tbody.appendChild(row);
+                            }
+                        }
+                    } else {
+                        document.getElementById('responseTable').style.display = 'none';
+                        document.getElementById('response').textContent = 'Error: ' + xhr.status + ' - ' + xhr.statusText;
+                    }
+                }
+            };
+
+            // Send the request without a request body
+            xhr.send();
+        });
+        document.getElementById('postButton').addEventListener('click', function () {
+            // Create a new FormData object
+            var formData = new FormData();
+            formData.append('image', fileChooser.files[0]);
+            formData.append("min_confidence", minConfidence.value);
+            var url = '/v1/vision/detection';
+
+            fetch(url, { method: "POST", body: formData})
+              .then(response => {
+                if (response.ok) {
+                    response.json().then(data => {
+                        document.getElementById('detectResponse').textContent = JSON.stringify(data, undefined, 2)
+                    })
+                }
+            })
+                .catch (error => {
+                    console.log('Unable to complete API call: ' + error);
+            });
+        });
+        document.getElementById('postButtonVis').addEventListener('click', function () {
+            // Get the selected model from the dropdown
+            var selectedModel = document.getElementById('customModelVis').value;
+
+            // Create a new FormData object
+            var formData = new FormData();
+            formData.append('image', fileChooserVis.files[0]);
+            formData.append("min_confidence", minConfidenceVis.value);
+
+            // Substitute the selected model in the URL
+            var url = '/v1/visualization/custom/' + selectedModel;
+
+            fetch(url, { method: "POST", body: formData })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Unable to complete API call: ' + response.status + ' - ' + response.statusText);
+                    }
+                })
+                .then(data => {
+                    // Display the JSON response
+                    document.getElementById('detectVisResponse').textContent = JSON.stringify(data, undefined, 2);
+
+                    // Display the image if imagePath exists in the response
+                    if (data.imagePath) {
+                        var imageElement = document.getElementById('visualizationImage');
+                        imageElement.src = data.imagePath; // Assuming imagePath is a relative URL
+                        imageElement.style.display = 'block'; // Make the image visible
+                    }
+                })
+                .catch(error => {
+                    console.log('Unable to complete API call: ' + error);
+                });
+        });
+    </script>
+</body>
+</html>
