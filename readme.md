@@ -155,7 +155,7 @@ You may close the second (new) terminal.
 
 ## Upgrading hailort
 
-Based on upgrade from 4.18 to 4.19 - change file accordingly for other versions 
+Based on upgrade from 4.18 to 4.19 - change file names accordingly for other versions 
 
 1. Download new hailort files: pcie driver, hailort and python3.10 wheel
 2. Download new models - usually they are recompiled
@@ -187,7 +187,8 @@ sudo dpkg -i hailo_assets/hailort-pcie-driver_4.19.0_all.deb
 sudo sudo dpkg -i hailo_assets/hailort_4.19.0_amd64.deb
 ```
 8. Reboot
-9. Complete the Python wheel install and/or Docker image creation and starting a container
+9. For running in Docker change Python lib wheel filename in `Dockerfile` 
+10. Complete the Python wheel install and/or Docker image creation and starting a container
 
 ## Connecting to BlueIris and Frigate
 
