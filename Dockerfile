@@ -39,7 +39,7 @@ COPY requirements.txt /app/
 COPY hailo_assets/ /app/hailo_assets/
 
 # compile HailoRT wheel
-RUN python -m pip install ./hailo_assets/hailort-4.18.0-cp310-cp310-linux_x86_64.whl
+RUN python -m pip install ./hailo_assets/hailort-4.19.0-cp310-cp310-linux_x86_64.whl
 
 RUN python -m pip install -r requirements.txt
 

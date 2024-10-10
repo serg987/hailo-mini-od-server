@@ -56,11 +56,11 @@ between and DIY 2 M2 holes with threads in the heatsink.
    ![](media/Hailo_card_installed.jpg)
 3. Register on [Hailo AI Developer Zone](https://hailo.ai/developer-zone/) and download the following files (`amd64` for Intel CPU machines, for
 RPi5 - `arm64`, use other architectures if needed):
- - `hailort-pcie-driver_4.18.0_all.deb`
- - `hailort_4.18.0_amd64.deb`
- - `hailort-4.18.0-cp310-cp310-linux_x86_64.whl`
+ - `hailort-pcie-driver_4.19.0_all.deb`
+ - `hailort_4.19.0_amd64.deb`
+ - `hailort-4.19.0-cp310-cp310-linux_x86_64.whl`
 
-    4.18.0 is the latest version published at the moment of development, and it was used for this project. Other 
+    4.19.0 is the latest version published at the moment of development, and it was used for this project. Other 
 versions are not guaranteed to work.
 
 4. Download precompiled models from Hailo AI GitHub:
@@ -87,7 +87,7 @@ sudo apt install build-essential g++-12 gcc-12 linux-headers-$(uname -r) dkms
 ```
 then install PCIe driver
 ```commandline
-dpkg -i hailort-pcie-driver_4.18.0_all.deb
+dpkg -i hailort-pcie-driver_4.19.0_all.deb
 ```
 if for any reason driver installation was not successful, purge it before runninng it again
 ```commandline
@@ -105,7 +105,7 @@ It would be easier to debug and make changes
 
 1. Desktop only (RPi5 should already have HailoRT at this point). Install HailoRT:
 ```commandline
-sudo dpkg -i hailort_4.18.0_amd64.deb
+sudo dpkg -i hailort_4.19.0_amd64.deb
 ```
 2. Important! Reboot the machine
 3. Check the Hailo device is recognized and working:
@@ -119,7 +119,7 @@ Ubuntu 22.04 already has Python 3.10 otherwise install it
 4. Create venv inside the repo `python -m venv venv`
 5. Upgrade pip `pip install --upgrade pip`
 6. Install project requirements `pip install -r requirements.txt`
-7. Compile and install Hailo wheel `pip install hailo_assets/hailort-4.18.0-cp310-cp310-linux_x86_64.whl `
+7. Compile and install Hailo wheel `pip install hailo_assets/hailort-4.19.0-cp310-cp310-linux_x86_64.whl`
 8. Now you can start the server locally - `python main.py`. It will open port 8080 where you can connect to from 
 a browser and Blue Iris and/or Frigate
 
@@ -135,7 +135,7 @@ code changes easier as it is just restarting a docker compose
 
 1. Build preliminary Docker image `docker build -t hailo-od-mini .`
 2. Run this image as a container in interactive mode `docker run --rm -it --entrypoint bash -v ./:/app hailo-od-mini`
-3. In the container bash install hailort `dpkg -i hailo_assets/hailort_4.18.0_amd64.deb`
+3. In the container bash install hailort `dpkg -i hailo_assets/hailort_4.19.0_amd64.deb`
 4. Do not close the current terminal, open a new one. In the new one:
 
 ```
@@ -152,6 +152,42 @@ You may close the second (new) terminal.
 5. In the first one - exit the container with `exit`. The image has hailort installed now. 
 6. Start the container `docker compose up --detach`
 7. If need to restart the container - `docker compose down` and `docker compose up --detach` again
+
+## Upgrading hailort
+
+Based on upgrade from 4.18 to 4.19 - change file accordingly for other versions 
+
+1. Download new hailort files: pcie driver, hailort and python3.10 wheel
+2. Download new models - usually they are recompiled
+3. Stop and delete docker containers and images:
+```commandline
+docker ps
+```
+
+Find `CONTAINER ID` that has `IMAGE` `hailo-od-mini` in the output. Then run (substitute {CONTAINER ID} with the one from
+output)
+```
+docker stop hailo-mini-od-server-hailo-object-detection-mini-1
+docker container rm {CONTAINER ID}
+docker image rm hailo-od-mini
+```
+4. Uninstall Hailo Python lib (check the version was installed before):
+```commandline
+pip uninstall hailo_assets/hailort-4.18.0-cp310-cp310-linux_x86_64.whl
+```
+5. Uninstall HailoRT and PCIe driver:
+```commandline
+sudo dpkg -P hailort
+sudo dpkg --purge --force-all hailort-pcie-driver
+```
+6. Reboot
+7. Install PCIe driver and HailoRT package
+```commandline
+sudo dpkg -i hailo_assets/hailort-pcie-driver_4.19.0_all.deb
+sudo sudo dpkg -i hailo_assets/hailort_4.19.0_amd64.deb
+```
+8. Reboot
+9. Complete the Python wheel install and/or Docker image creation and starting a container
 
 ## Connecting to BlueIris and Frigate
 
