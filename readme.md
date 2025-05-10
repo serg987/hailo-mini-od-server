@@ -56,11 +56,11 @@ between and DIY 2 M2 holes with threads in the heatsink.
    ![](media/Hailo_card_installed.jpg)
 3. Register on [Hailo AI Developer Zone](https://hailo.ai/developer-zone/) and download the following files (`amd64` for Intel CPU machines, for
 RPi5 - `arm64`, use other architectures if needed):
- - `hailort-pcie-driver_4.19.0_all.deb`
- - `hailort_4.19.0_amd64.deb`
- - `hailort-4.19.0-cp310-cp310-linux_x86_64.whl`
+ - `hailort-pcie-driver_4.21.0_all.deb`
+ - `hailort_4.21.0_amd64.deb`
+ - `hailort-4.21.0-cp310-cp310-linux_x86_64.whl`
 
-    4.19.0 is the latest version published at the moment of development, and it was used for this project. Other 
+    4.21.0 is the latest version published at the moment of development, and it was used for this project. Other 
 versions are not guaranteed to work.
 
 4. Download precompiled models from Hailo AI GitHub:
@@ -87,7 +87,7 @@ sudo apt install build-essential g++-12 gcc-12 linux-headers-$(uname -r) dkms
 ```
 then install PCIe driver
 ```commandline
-dpkg -i hailort-pcie-driver_4.19.0_all.deb
+dpkg -i hailort-pcie-driver_4.21.0_all.deb
 ```
 if for any reason driver installation was not successful, purge it before runninng it again
 ```commandline
@@ -105,7 +105,7 @@ It would be easier to debug and make changes
 
 1. Desktop only (RPi5 should already have HailoRT at this point). Install HailoRT:
 ```commandline
-sudo dpkg -i hailort_4.19.0_amd64.deb
+sudo dpkg -i hailort_4.21.0_amd64.deb
 ```
 2. Important! Reboot the machine
 3. Check the Hailo device is recognized and working:
@@ -119,7 +119,7 @@ Ubuntu 22.04 already has Python 3.10 otherwise install it
 4. Create venv inside the repo `python -m venv venv`
 5. Upgrade pip `pip install --upgrade pip`
 6. Install project requirements `pip install -r requirements.txt`
-7. Compile and install Hailo wheel `pip install hailo_assets/hailort-4.19.0-cp310-cp310-linux_x86_64.whl`
+7. Compile and install Hailo wheel `pip install hailo_assets/hailort-4.21.0-cp310-cp310-linux_x86_64.whl`
 8. Now you can start the server locally - `python main.py`. It will open port 8080 where you can connect to from 
 a browser and Blue Iris and/or Frigate
 
@@ -135,7 +135,7 @@ code changes easier as it is just restarting a docker compose
 
 1. Build preliminary Docker image `docker build -t hailo-od-mini .`
 2. Run this image as a container in interactive mode `docker run --rm -it --entrypoint bash -v ./:/app hailo-od-mini`
-3. In the container bash install hailort `dpkg -i hailo_assets/hailort_4.19.0_amd64.deb`
+3. In the container bash install hailort `dpkg -i hailo_assets/hailort_4.21.0_amd64.deb`
 4. Do not close the current terminal, open a new one. In the new one:
 
 ```
